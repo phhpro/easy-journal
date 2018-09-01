@@ -2,7 +2,7 @@
 
 **PHP Easy Journal** is a minimalist **free PHP micro blogging script** to post brief data blobs. No database required.
 
-Open the script and edit the `user config` section to match your environment.
+Open the script and edit the "user config" section to match your environment.
 
 You can add new entries or edit old ones by calling the script with the editor token set in `$edit` on line #54.
 The default token is `?edit`. Example URL: `http://example.com/easy-journal/?edit`
