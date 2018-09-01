@@ -1,6 +1,6 @@
 # PHP Easy Journal
 
-**PHP Easy Journal** is a minimalist **free PHP micro blogging script** to post brief data blobs. No database required.
+**PHP Easy Journal** is a minimalist **free PHP micro blogging script** to post snippets and other blobs. No database required.
 
 Open the script and edit the "user config" section to match your environment.
 
