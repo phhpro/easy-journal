@@ -37,47 +37,34 @@
 
 
 /**
- * Document root -- "path" without trailing / if SERVER has wrong value
- * Script folder
- * Archives folder
+ * Document root
+ *
+ * Full path without trailing / if $_SERVER has wrong value.
+ * Example: $path = "/home/john/htdocs";
  */
 $path = $_SERVER['DOCUMENT_ROOT'];
+
+/**
+ * Script folder
+ * Archives folder
+ * Editor token
+ */
 $fold = "/easy-journal";
 $arch = "/archives";
-
-
-/**
- * Default index
- * Data file type
- * Editor query
- */
-$indx = "index.php";
-$type = "html";
 $edit = "edit";
 
-
 /**
- * Default language
- */
-$lang = "en";
-
-
-/**
- * Blog name
+ * Blog name and META
  */
 $name = "PHP Easy Journal";
-
-
-/**
- * META description
- */
-$mdes = "PHP Easy Journal free PHP micro blogging script";
-
-
-/**
- * META keywords
- */
+$mdes = "PHP Easy Journal free PHP micro blogging script by phhpro";
 $mkey = "PHP Easy Journal";
+
+/**
+ * Default index and language
+ */
+$indx = "index.php";
+$lang = "en";
 
 
 /**
@@ -88,9 +75,9 @@ $mkey = "PHP Easy Journal";
 
 
 //** Script version
-$make = 20180328;
+$make = 20180901;
 
-//** Link protocol
+//** Check protocol
 if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
     $prot = "s";
 } else {
@@ -99,24 +86,26 @@ if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
 
 $prot = "http" . $prot . "://";
 
-//** Host running the script and path to script folder
+/**
+ * Host
+ * Script path
+ * Data path
+ * Data type
+ * Data file
+ * Save location
+ * Post location
+ * Status
+ */
 $host = $_SERVER['HTTP_HOST'];
 $home = $path . $fold;
-
-//** Date format
-$daty = date('Y');
-$datm = date('m');
-
-//** Link data folder, data file type, and data file
-$datc = $home . $arch . "/" . $daty;
-$item = $datm . "." . $type;
-$save = $datc . "/" . $item;
-
-//** Post location and status
+$data = $home . $arch . "/" . date('Y');
+$type = "html";
+$item = date('m') . "." . $type;
+$save = $data . "/" . $item;
 $post = $prot . $host . $_SERVER['SCRIPT_NAME'] . "?" . $edit;
 $stat = "";
 
-//** Header
+//** Begin mark-up
 echo "<!DOCTYPE html>\n" .
      '<html lang="' . $lang . '">' . "\n" .
      "    <head>\n" .
@@ -128,8 +117,6 @@ echo "<!DOCTYPE html>\n" .
      '        <meta name=keywords content="' . $mkey . '"/>' . "\n" .
      '        <meta name=robots content="noodp, noydir"/>' . "\n" .
      "        <title>$name</title>\n" .
-
-     //** Styles
      "        <style>\n" .
      "        * {\n" .
      "            font-family: sans-serif;\n" .
@@ -144,8 +131,6 @@ echo "<!DOCTYPE html>\n" .
      "            border-bottom: 1px solid #ccc;\n" .
      "        }\n" .
      "        </style>\n" .
-
-     //** Close header and begin page
      "    </head>\n" .
      "    <body>\n" .
      "        <h1>$name</h1>\n";
@@ -172,25 +157,25 @@ if (isset($_GET[$edit])) {
                     " <strong>" . $_POST['head'] . "</strong></div>\n" .
                     "        <p class=text>" . $_POST['text'] . "</p>\n";
 
-            //** Check archives directory
+            //** Check archives folder
             if (!is_dir($home . $arch)) {
 
                 if (mkdir($home . $arch) === false) {
-                    echo "Failed to create archives dir!";
+                    echo "Failed to create archives folder!";
                     exit;
                 } else {
                     mkdir($home . $arch);
                 }
             }
 
-            //** Check data directory
-            if (!is_dir($datc)) {
+            //** Check data folder
+            if (!is_dir($data)) {
 
-                if (mkdir($datc) === false) {
-                    echo "Failed to create data dir!";
+                if (mkdir($data) === false) {
+                    echo "Failed to create data folder!";
                     exit;
                 } else {
-                    mkdir($datc);
+                    mkdir($data);
                 }
             }
 
@@ -233,7 +218,7 @@ if (isset($_GET[$edit])) {
          'accept-charset="UTF-8">' . "\n" .
          "            <p><label for=head>Header</label></p>\n" .
          "            <textarea name=head id=head " .
-         'rows=3 cols=80 title="Enter header">';
+         'rows=3 cols=80 title="Type here to enter the header text">';
 
     if (isset($_POST['head'])) {
         echo $_POST['head'];
@@ -241,8 +226,8 @@ if (isset($_GET[$edit])) {
 
     echo "</textarea>\n" .
          "            <p><label for=text>Text</label></p>\n" .
-         "            <textarea name=text id=text " .
-         'rows=10 cols=80 title="Enter text">';
+         "            <textarea name=text id=text rows=10 cols=80 " .
+         'title="Type here to enter text of new entry">';
 
     if (isset($_POST['text'])) {
         echo $_POST['txt'];
@@ -251,28 +236,29 @@ if (isset($_GET[$edit])) {
     echo "</textarea>\n" .
          "            <p>\n" .
          "                <input type=submit name=post " .
-         'value="Add new entry" title="Add new entry"/>' . "\n" .
+         'value="Add" title="Click here to add a new entry"/>' . "\n" .
          "            </p>\n" .
 
-         //** Edit existing entries
-         "            <p><strong>Edit existing entries</strong></p>\n" .
+         //** Update old entries
+         "            <p><strong>Update old entries</strong></p>\n" .
          "            <p><label for=update_data>Data</label></p>\n" .
          "            <textarea name=update_data id=update_data " .
-         'rows=10 cols=80 title="Edit existing entries">' .
+         'rows=10 cols=80 title="Type here to edit old entries">' .
          "$new</textarea>\n" .
          "            <p>\n" .
          "                <input type=submit name=update " .
-         'value="Update data file" title="Update data file"/>' . "\n" .
+         'value="Update" ' .
+         'title="Click here to update the data file"/>' . "\n" .
          "            </p>\n" .
 
          //** Quit editor
          "            <p>\n" .
          "                <input type=submit name=quit " .
-         'value="Quit editor" title="Quit editor"/>' . "\n" .
+         'value="Quit" title="Click here to quit the editor"/>' . "\n" .
          "            </p>\n" .
          "        </form>\n";
 } else {
-    //** Link and check data file
+    //** Check data file
     $view = $save;
 
     if (!is_file($save)) {
@@ -319,7 +305,7 @@ if (isset($_GET[$edit])) {
     }
 }
 
-//** Footer
+//** End mark-up
 echo "        <p>&copy; " . date('Y') . " " . $name . " - " .
      "All rights reserved</p>\n" .
      '        <p>Powered by ' .
