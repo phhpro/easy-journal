@@ -30,9 +30,9 @@
 
 
 /**
- ***********************************************************************
+ * *********************************************************************
  *                                                   BEGIN USER CONFIG *
- ***********************************************************************
+ * *********************************************************************
  */
 
 
@@ -71,16 +71,16 @@ $lang = "en";
 
 
 /**
- ***********************************************************************
+ * *********************************************************************
  *                                                     END USER CONFIG *
- ***********************************************************************
+ * *********************************************************************
  */
 
 
-//** Script version
-$make = "20180902";
+//** Version
+$make = "20180917";
 
-//** Check protocol
+//** Protocol
 if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
     $prot = "s";
 } else {
@@ -89,31 +89,22 @@ if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
 
 $prot = "http" . $prot . "://";
 
-/**
- * Host
- * Script path
- */
+//** Host and path
 $host = $_SERVER['HTTP_HOST'];
 $home = $path . $fold;
 
-/**
- * Data year
- * Data file
- */
+//** Data year and file
 $year = $home . $data . "/" . date('Y');
 $file = date('m') . ".html";
 
-/**
- * Save location
- * Post location
- */
+//** Save and post location
 $save = $year . "/" . $file;
 $post = $prot . $host . $_SERVER['SCRIPT_NAME'] . "?" . $edit;
 
 //** Status
 $stat = "";
 
-//** Check mode
+//** Mode
 if (isset($_GET[$edit])) {
     $mode = " - Editor";
 } else {
@@ -164,16 +155,16 @@ if (isset($_GET[$edit])) {
     }
 
     /**
-     * WARNING: Unfiltered POST data is a potential security risk!
-     *
-     * While the script assumes you are the only one with access
-     * to the editor token, even a basic htmlentities() wrapper
-     * can improve security -- at the cost of text-only entries.
+     * *****************************************************************
+     * WARNING -- Unfiltered POST data is a potential security risk!   *
+     *                                                                 *
+     * Even a simple htmlentities() can improve security -- albeit at  *
+     * the cost of text-only entries. See below for an example.        *
+     *                                                                 *
+     * $head = htmlentities($_POST['head']);                           *
+     * $text = htmlentities($_POST['text']);                           *
+     * *****************************************************************
     */
-/*
-    $head = htmlentities($_POST['head']);
-    $text = htmlentities($_POST['text']);
-*/
     $head = $_POST['head'];
     $text = $_POST['text'];
 
@@ -347,8 +338,8 @@ if (isset($_GET[$edit])) {
 /**
  * End mark-up
  *
- * Please keep the reference link intact.
- * Others may find the script useful too, thank you.
+ * Please keep the reference intact.
+ * Others may also find this useful, thank you.
  */
 echo "        <p>&copy; " . date('Y') . " " . $host . " - " .
      "All rights reserved</p>\n" .
