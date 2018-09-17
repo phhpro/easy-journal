@@ -5,7 +5,7 @@
 Open the script and edit the `user config` section to match your environment.
 
 You can add new entries or edit old ones by calling the script with the editor token set in `$edit` on line #55.
-The default token is `?edit`. Example URL: `http://example.com/easy-journal/?edit`
+The default token is `edit`. Example URL: `http://example.com/easy-journal/?edit`
 
 
 - Press the `Post` button to post a new entry.
