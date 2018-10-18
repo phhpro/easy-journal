@@ -40,34 +40,33 @@
  * Document root
  *
  * Full path without trailing / if $_SERVER has wrong value.
- * Example: $path = "/home/john/htdocs";
+ * Example: $ejn_path = "/home/john/htdocs";
  */
-$path = $_SERVER['DOCUMENT_ROOT'];
+$ejn_path = $_SERVER['DOCUMENT_ROOT'];
 
 
 /**
- * Script folder
- * Data folder
- * Editor token
+ * Script and data folder -- without trailing /
  */
-$fold = "/easy-journal";
-$data = "/data";
-$edit = "edit";
+$ejn_fold = "/easy-journal";
+$ejn_data = "/data";
+
+/**
+ * Editor token to invoke editor screen, e.g. /easy-journal/?edit
+ * Frontend language -- must match language file (without extension)
+ */
+$ejn_edit = "edit";
+$ejn_lang = "en";
 
 
 /**
- * Blog name and META
+ * Blog title
+ * META description
+ * META keywords
  */
-$name = "PHP Easy Journal";
-$mdes = "PHP Easy Journal free PHP micro blogging script by phhpro";
-$mkey = "PHP Easy Journal";
-
-
-/**
- * Default index and language
- */
-$indx = "index.php";
-$lang = "en";
+$ejn_blog = "John's blogs of cats and dogs";
+$ejn_mdes = "John's personal blogs about cats and dogs and whatnot.";
+$ejn_mkey = "john doe,blogs,cats,dogs";
 
 
 /**
@@ -77,80 +76,78 @@ $lang = "en";
  */
 
 
-//** Version
-$make = "20180917";
+//** Script version
+$ejn_make = "20181018";
 
-//** Protocol
+//** Check protocol
 if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
-    $prot = "s";
+    $ejn_prot = "s";
 } else {
-    $prot = "";
+    $ejn_prot = "";
 }
 
-$prot = "http" . $prot . "://";
+$ejn_prot = "http$ejn_prot://";
 
 //** Host and path
-$host = $_SERVER['HTTP_HOST'];
-$home = $path . $fold;
+$ejn_host = $_SERVER['HTTP_HOST'];
+$ejn_home = "$ejn_path$ejn_fold";
 
-//** Data year and file
-$year = $home . $data . "/" . date('Y');
-$file = date('m') . ".html";
+//** Content folder and data file
+$ejn_cont = "$ejn_home$ejn_data/" . date('Y');
+$ejn_file = date('m') . ".html";
 
 //** Save and post location
-$save = $year . "/" . $file;
-$post = $prot . $host . $_SERVER['SCRIPT_NAME'] . "?" . $edit;
+$ejn_save = "$ejn_cont/$ejn_file";
+$ejn_post = "$ejn_prot$ejn_host" . $_SERVER['SCRIPT_NAME'] . "?$ejn_edit";
 
-//** Status
-$stat = "";
+//** Language data file
+$ejn_ldat = "$ejn_home/lang/$ejn_lang.php";
 
-//** Mode
-if (isset($_GET[$edit])) {
-    $mode = " - Editor";
+if (file_exists($ejn_ldat)) {
+    include $ejn_ldat;
 } else {
-    $mode = "";
+    echo "Missing or invalid language file! Script halted.";
+    exit;
 }
 
-//** Begin mark-up
+
+//** Language file OK -- localised strings now available
+
+
+//** Check mode
+if (isset($_GET[$ejn_edit])) {
+    $ejn_mode = " - " . $ejn_lstr['editor'];
+} else {
+    $ejn_mode = "";
+}
+
+//** Header
 echo "<!DOCTYPE html>\n" .
-     "<html lang=\"$lang\">\n" .
+     "<html lang=\"$ejn_lang\">\n" .
      "    <head>\n" .
      "        <meta charset=\"UTF-8\"/>\n" .
-     "        <meta name=language content=\"$lang\"/>\n" .
+     "        <meta name=language content=\"$ejn_lang\"/>\n" .
      "        <meta name=viewport content=\"width=device-width, " .
      "height=device-height, initial-scale=1\"/>\n" .
-     "        <meta name=description content=\"$mdes\"/>\n" .
-     "        <meta name=keywords content=\"$mkey\"/>\n" .
-     '        <meta name=robots content="noodp, noydir"/>' . "\n" .
-     "        <title>$name$mode</title>\n" .
-     "        <style>\n" .
-     "        * {\n" .
-     "            font-family: sans-serif;\n" .
-     "        }\n" .
-     "        input, textarea {\n" .
-     "            width: 50.5%;\n" .
-     "            font-size: 90%;\n" .
-     "        }\n" .
-     "        input[type=submit] {\n" .
-     "            width: 25%;\n" .
-     "            font-weight: bold;\n" .
-     "        }\n" .
-     "        .text {\n" .
-     "            white-space: pre-wrap;\n" .
-     "            word-wrap: break-word;\n" .
-     "            border-bottom: 1px solid #ccc;\n" .
-     "        }\n" .
-     "        </style>\n" .
+     "        <meta name=description " .
+     "content=\"PHP Easy Journal " .
+     "free PHP micro blogging script by phhpro. $ejn_mdes\"/>\n" .
+     "        <meta name=keywords " .
+     "content=\"PHP Easy Journal,$ejn_mkey\"/>\n" .
+     "        <meta name=robots content=\"noodp, noydir\"/>\n" .
+     "        <link rel=stylesheet " .
+     "href=\"$ejn_prot$ejn_host$ejn_fold/style.css\">\n" .
+     "        <title>$ejn_blog$ejn_mode</title>\n" .
      "    </head>\n" .
      "    <body>\n" .
-     "        <h1>$name$mode</h1>\n";
+     "        <h1>$ejn_blog$ejn_mode</h1>\n";
 
 //** Check editor query
-if (isset($_GET[$edit])) {
+if (isset($_GET[$ejn_edit])) {
 
     //** Quit editor
-    if (isset($_POST['quit'])) {
-        header("Location: $prot$host$fold");
+    if (isset($_POST['ejn_quit'])) {
+        header("Location: $ejn_prot$ejn_host$ejn_fold");
         exit;
     }
 
@@ -158,198 +155,211 @@ if (isset($_GET[$edit])) {
      * *****************************************************************
      * WARNING -- Unfiltered POST data is a potential security risk!   *
      *                                                                 *
-     * Even a simple htmlentities() can improve security -- albeit at  *
-     * the cost of text-only entries. See below for an example.        *
+     * See below how to sanitise data using htmlentities()             *
      *                                                                 *
-     * $head = htmlentities($_POST['head']);                           *
-     * $text = htmlentities($_POST['text']);                           *
+     * However, this will completely disable all mark-up, so no more   *
+     * formatting, images, etc. Your posts will be stricly text only.  *
+     *                                                                 *
+     * $ejn_head = htmlentities($_POST['head']);                           *
+     * $ejn_text = htmlentities($_POST['text']);                           *
      * *****************************************************************
     */
-    $head = $_POST['head'];
-    $text = $_POST['text'];
+    $ejn_head = $_POST['ejn_head'];
+    $ejn_text = $_POST['ejn_text'];
 
     //** Post entry
-    if (isset($_POST['post'])) {
+    if (isset($_POST['ejn_post'])) {
 
         //** Check values and build entry
-        if ($head ===  "") {
-            $stat = "Missing header!";
-        } elseif ($text === "") {
-            $stat = "Missing text!";
+        if ($ejn_head ===  "") {
+            echo "        <p class=ejn_info>" .
+                 $ejn_lstr['head_miss'] . "</p>\n";
+        } elseif ($ejn_text === "") {
+            echo "        <p class=ejn_info>" .
+                 $ejn_lstr['text_miss'] . "</p>\n";
         } else {
-            $body = "        <div class=head>" . date('Y-m-d H:i:s') .
-                    " <strong>$head</strong></div>\n" .
-                    "        <p class=text>$text</p>\n";
+            $ejn_body = "        <div class=ejn_item>\n" .
+                        "            <div class=ejn_head>" .
+                        date('Y-m-d H:i:s') .
+                        " <strong>$ejn_head</strong></div>\n" .
+                        "            <div class=ejn_text>$ejn_text</div>\n" .
+                        "        </div>\n";
 
-            //** Check primary data folder
-            if (!is_dir("$home$data")) {
+            //** Check data folder
+            if (!is_dir("$ejn_home$ejn_data")) {
 
-                if (mkdir("$home$data") === false) {
-                    echo "Failed to create archives folder!";
+                if (mkdir("$ejn_home$ejn_data") === false) {
+                    echo $ejn_lstr['data_fail'];
                     exit;
                 } else {
-                    mkdir("$home$data");
+                    mkdir("$ejn_home$ejn_data");
                 }
             }
 
-            //** Check secondary data folder
-            if (!is_dir($year)) {
+            //** Check content folder
+            if (!is_dir($ejn_cont)) {
 
-                if (mkdir($year) === false) {
-                    echo "Failed to create data folder!";
+                if (mkdir($ejn_cont) === false) {
+                    echo $ejn_lstr['cont_fail'];
                     exit;
                 } else {
-                    mkdir($year);
+                    mkdir($ejn_cont);
                 }
             }
 
             //** Read existing data file
-            if (is_file($save)) {
-                $body .= file_get_contents($save);
+            if (is_file($ejn_save)) {
+                $ejn_body .= file_get_contents($ejn_save);
             }
 
             //** Save entry
-            file_put_contents($save, $body);
-            header("Location: $post");
+            file_put_contents($ejn_save, $ejn_body);
+            header("Location: $ejn_post");
             exit;
         }
     }
 
     //** Check data file
-    if (is_file($save)) {
-        $newd = file_get_contents($save);
+    if (is_file($ejn_save)) {
+        $ejn_newd = file_get_contents($ejn_save);
     } else {
-        $newd = "";
-        $stat = "No current entries.";
+        $ejn_newd = "";
     }
 
-    //** Add new entry
-    if (isset($_POST['update'])) {
+    //** Check if posting update
+    if (isset($_POST['ejn_update'])) {
         /**
          * No filter to keep sources intact
          * No exit to keep editor open
          */
-        if ($newd !== "") {
-            $newd = $_POST['update_data'];
-            file_put_contents($save, $newd);
-            header("Location: $post");
+        if ($ejn_newd !== "") {
+            $ejn_newd = $_POST['ejn_update_data'];
+            file_put_contents($ejn_save, $ejn_newd);
+            header("Location: $ejn_post");
         }
     }
 
-    echo "        <form action=\"#\" method=POST " .
-         "accept-charset=\"UTF-8\">\n" .
-         "        <h2>New</h2>\n" .
-         "        <p>$stat</p>\n" .
-         "            <p><label for=head>Head</label></p>\n" .
-         "            <textarea name=head id=head rows=2 cols=80 " .
-         "title=\"Type here to enter the entry's title text\">";
+    //** Open editor form
+    echo "        <form action=\"#\" " .
+         "method=POST accept-charset=\"UTF-8\">\n" .
+         "        <h2>" . $ejn_lstr['new'] . "</h2>\n" .
 
-    if (isset($head)) {
-        echo $head;
+    //** Entry title
+         "            <p><label for=ejn_head>" .
+         $ejn_lstr['head'] . "</label></p>\n" .
+         "            <textarea " .
+         "name=ejn_head id=ejn_head rows=2 cols=80 " .
+         "title=\"" . $ejn_lstr['head_tip'] . "\">";
+
+    if (isset($ejn_head)) {
+        echo $ejn_head;
     }
 
     echo "</textarea>\n" .
-         "            <p><label for=text>Text</label></p>\n" .
-         "            <textarea name=text id=text rows=8 cols=80 " .
-         "title=\"Type here to enter the entry's body text\">";
 
-    if (isset($text)) {
-        echo $text;
+    //** Entry text
+         "            <p><label for=ejn_text>" .
+         $ejn_lstr['text'] . "</label></p>\n" .
+         "            <textarea " .
+         "name=ejn_text id=ejn_text rows=8 cols=80 " .
+         "title=\"" . $ejn_lstr['text_tip'] . "\">";
+
+    if (isset($ejn_text)) {
+        echo $ejn_text;
     }
 
     echo "</textarea>\n" .
+
+    //** Post new entry
          "            <p>\n" .
-         "                <input " .
-         "type=submit name=post value=\"Post\" " .
-         "title=\"Click here to post a new entry\"/>\n" .
-         "                <input " .
-         "type=submit name=quit value=\"Quit\" " .
-         "title=\"Click here to quit the editor\"/>\n" .
-
+         "                <input type=submit name=ejn_post " .
+         "value=\"" . $ejn_lstr['post'] . "\" " .
+         "title=\"" . $ejn_lstr['post_tip'] . "\"/>\n" .
+         "                <input type=submit name=ejn_quit " .
+         "value=\"" . $ejn_lstr['quit'] . "\" " .
+         "title=\"" . $ejn_lstr['quit_tip'] . "\"/>\n" .
          "            </p>\n" .
 
-         //** Edit old entry
-         "            <h2>Old</h2>\n" .
-         "            <p><label for=update_data>Data</label></p>\n" .
-         "            <textarea name=update_data id=update_data " .
-         "rows=8 cols=80 title=\"Type here to edit old entries\">" .
-         "$newd</textarea>\n" .
+    //** Edit old entry
+         "            <h2>" . $ejn_lstr['old'] . "</h2>\n" .
+         "            <p><label for=ejn_update_data>" .
+         $ejn_lstr['data'] . "</label></p>\n" .
+         "            <textarea " .
+         "name=ejn_update_data ejn_id=update_data rows=8 cols=80 " .
+         "title=\"" . $ejn_lstr['old_tip'] . "\">$ejn_newd" .
+         "</textarea>\n" .
          "            <p>\n" .
-         "                <input " .
-         "type=submit name=update value=\"Update\" " .
-         "title=\"Click here to update modified old entries\"/>\n" .
-         "                <input " .
-         "type=submit name=quit value=\"Quit\" " .
-         "title=\"Click here to quit the editor\"/>\n" .
+
+    //** Update old entry
+         "                <input type=submit name=ejn_update " .
+         "value=\"" . $ejn_lstr['update'] . "\" " .
+         "title=\"" . $ejn_lstr['update_tip'] . "\"/>\n" .
+         "                <input type=submit name=ejn_quit " .
+         "value=\"" . $ejn_lstr['quit'] . "\" " .
+         "title=\"" . $ejn_lstr['quit_tip'] . "\"/>\n" .
          "            </p>\n" .
          "        </form>\n";
 } else {
-    //** Check data file
-    $view = $save;
+    //** Check data folder
+    if (!is_dir("$ejn_home$ejn_data")) {
+        echo "        <p>" . $ejn_lstr['nothing'] . "</p>\n";
+    } else {
+        //** Trim path
+        $view = str_replace("$ejn_prot$ejn_host", $ejn_path, $ejn_save);
 
-    if (!is_file($save)) {
-        $stat = "No current entries.";
-    }
+        //** View data file
+        if (is_file($view)) {
+            echo file_get_contents($view);
+        }
 
-    //** Print status and trim path
-    echo "        <p>$stat</p>\n";
-    $view = str_replace($prot . $host, $path, $view);
+        //** Parse data folder
+        echo "        <h2>" . $ejn_lstr['archives'] . "</h2>\n";
+        chdir(".$ejn_data");
+        $ejn_pdir = glob("*", GLOB_ONLYDIR);
 
-    //** Load selected data file
-    if (is_file($view)) {
-        echo file_get_contents($view);
-    }
-
-    //** Check and parse data folder
-    if (is_dir("$home$data")) {
-        echo "        <h2>Data</h2>\n";
-        chdir("." . $data);
-        $dirs = glob("*", GLOB_ONLYDIR);
-
-        foreach ($dirs as $dir) {
+        foreach ($ejn_pdir as $ejn_cdir) {
             echo "        <ul>\n" .
-                 "            <li><strong>$dir</strong>\n" .
+                 "            <li><strong>$ejn_cdir</strong>\n" .
                  "                <ul>\n";
-            $scan = glob("$dir/*.html");
+            $ejn_scan = glob("$ejn_cdir/*.html");
 
-            foreach ($scan as $file) {
-                $list = str_replace($dir . "/", "", $file);
-                $list = str_replace(".html", "", $list);
+            foreach ($ejn_scan as $ejn_file) {
+                $ejn_list = str_replace("$ejn_cdir/", "", $ejn_file);
+                $ejn_list = str_replace(".html", "", $ejn_list);
 
                 echo "                    <li>" .
-                     "<a href=\"$prot$host$fold$data/$file\" " .
-                     "title=\"View data file " .
-                     str_replace(".html", "", $file) . "\" " .
-                     "class=ext>$list</a></li>\n";
+                     "<a href=\"" .
+                     "$ejn_prot$ejn_host$ejn_fold$ejn_data/$ejn_file\" " .
+                     "title=\"" . $ejn_lstr['view_tip'] . " " .
+                     str_replace(".html", "", $ejn_file) . "\" " .
+                     "class=ejn_ext>$ejn_list</a></li>\n";
             }
 
-            unset($file);
+            unset($ejn_file);
             echo "                </ul>\n";
         }
 
-        unset($dir);
+        unset($ejn_cdir);
         echo "            </li>\n" .
              "        </ul>\n";
-    } else {
-        $stat = "No current entries.";
     }
 }
 
 /**
- * End mark-up
+ * Footer
  *
- * Please keep the reference intact.
- * Others may also find this useful, thank you.
+ * GPL v3 -- Please keep the script reference intact.
+ * Others may also find this useful.
  */
-echo "        <p>&copy; " . date('Y') . " " . $host . " - " .
-     "All rights reserved</p>\n" .
-     '        <p>Powered by ' .
-     '<a href="https://github.com/phhpro/easy-journal" ' .
-     'title="Click here to get a free copy of this script">' .
-     "PHP Easy Journal v$make</a></p>\n" .
-     '        <script>var a=document.getElementsByTagName("a");' .
-     'for(var i in a){if(a[i].className&&a[i].className.indexOf(' .
-     '"ext") !=-1){a[i].onclick=function(){return !window.open(' .
-     'this);}}}</script>' . "\n" .
+echo "        <p>&copy; " . date('Y') . " $ejn_host - " .
+     $ejn_lstr['rights'] . "</p>\n" .
+     "        <p id=ejn_by>" . $ejn_lstr['by'] . " " .
+     "<a href=\"https://github.com/phhpro/easy-journal\" " .
+     "title=\"" . $ejn_lstr['get_tip'] . "\" " .
+     "class=ejn_ext>PHP Easy Journal v$ejn_make</a></p>\n" .
+     "        <script>var a=document.getElementsByTagName('a');" .
+     "for(var i in a){if(a[i].className&&" .
+     "a[i].className.indexOf('ejn_ext') !=-1){a[i].onclick=function(){" .
+     "return !window.open(this);}}}</script>\n" .
      "    </body>\n" .
      "</html>\n";

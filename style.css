@@ -1,0 +1,73 @@
+@charset "UTF-8";
+
+* {
+    font-family: sans-serif;
+    font-size: 100%;
+}
+
+body {
+    background-color: #fff;
+    color: #333;
+}
+
+h1 {
+    font-size: 155%;
+}
+
+h2 {
+    font-size: 125%;
+}
+
+input, textarea {
+    width: 50.5%;
+    font-size: 90%;
+}
+
+input[type=submit] {
+    width: 25%;
+    font-weight: bold;
+}
+
+.ejn_head {
+    background-color: #ccc;
+    color: inherit;
+    padding: 4px;
+}
+
+.ejn_text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    border: 1px solid #ccc;
+    margin-top: 0;
+    padding: 4px;
+}
+
+.ejn_item:hover, .ejn_item:hover .ejn_head {
+    background-color: #999;
+    color: #000;
+}
+
+.ejn_info {
+    background-color: transparent;
+    color: #c00;
+    font-weight: bold;
+}
+
+#ejn_by {
+    font-size: 85%;
+}
+
+a:link {
+    background-color: transparent;
+    color: #00c;
+}
+
+a:visited {
+    background-color: transparent;
+    color: #c0c;
+}
+
+a:hover {
+    background-color: transparent;
+    color: #c00;
+}
