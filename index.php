@@ -37,35 +37,25 @@
 
 
 /**
- * Document root
- *
- * Full path without trailing / if $_SERVER has wrong value.
- * Example: $ejn_path = "/home/john/htdocs";
+ * Document root -- full path without trailing / if $_SERVER
+ * has wrong value, e.g. $ejn_path = "/home/john/htdocs";
  */
 $ejn_path = $_SERVER['DOCUMENT_ROOT'];
 
-
-/**
- * Script and data folder -- without trailing /
- */
+//** Script and data folder -- without trailing /
 $ejn_fold = "/easy-journal";
 $ejn_data = "/data";
 
 /**
- * Editor token to invoke editor screen, e.g. /easy-journal/?edit
- * Frontend language -- must match language file (without extension)
+ * Token to invoke editor screen, e.g. /easy-journal/?edit
+ * Language -- must match language file (without extension)
  */
 $ejn_edit = "edit";
 $ejn_lang = "en";
 
-
-/**
- * Blog title
- * META description
- * META keywords
- */
-$ejn_blog = "John's blogs of cats and dogs";
-$ejn_mdes = "John's personal blogs about cats and dogs and whatnot.";
+//** Blog title, description, and keywords
+$ejn_blog = "John's blog of cats and dogs";
+$ejn_mdes = "John's personal blog about cats and dogs and whatnot.";
 $ejn_mkey = "john doe,blogs,cats,dogs";
 
 
@@ -76,10 +66,8 @@ $ejn_mkey = "john doe,blogs,cats,dogs";
  */
 
 
-//** Script version
-$ejn_make = "20181018";
+$ejn_make = "20181230";
 
-//** Check protocol
 if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
     $ejn_prot = "s";
 } else {
@@ -87,32 +75,21 @@ if (isset($_SERVER['HTTPS']) && "on" === $_SERVER['HTTPS']) {
 }
 
 $ejn_prot = "http$ejn_prot://";
-
-//** Host and path
 $ejn_host = $_SERVER['HTTP_HOST'];
 $ejn_home = "$ejn_path$ejn_fold";
-
-//** Content folder and data file
 $ejn_cont = "$ejn_home$ejn_data/" . date('Y');
 $ejn_file = date('m') . ".html";
-
-//** Save and post location
 $ejn_save = "$ejn_cont/$ejn_file";
 $ejn_post = "$ejn_prot$ejn_host" . $_SERVER['SCRIPT_NAME'] . "?$ejn_edit";
-
-//** Language data file
 $ejn_ldat = "$ejn_home/lang/$ejn_lang.php";
 
-if (file_exists($ejn_ldat)) {
+//** Check language file
+if (is_file($ejn_ldat)) {
     include $ejn_ldat;
 } else {
     echo "Missing or invalid language file! Script halted.";
     exit;
 }
-
-
-//** Language file OK -- localised strings now available
-
 
 //** Check mode
 if (isset($_GET[$ejn_edit])) {
@@ -121,7 +98,6 @@ if (isset($_GET[$ejn_edit])) {
     $ejn_mode = "";
 }
 
-//** Header
 echo "<!DOCTYPE html>\n" .
      "<html lang=\"$ejn_lang\">\n" .
      "    <head>\n" .
@@ -160,8 +136,8 @@ if (isset($_GET[$ejn_edit])) {
      * However, this will completely disable all mark-up, so no more   *
      * formatting, images, etc. Your posts will be stricly text only.  *
      *                                                                 *
-     * $ejn_head = htmlentities($_POST['head']);                           *
-     * $ejn_text = htmlentities($_POST['text']);                           *
+     * $ejn_head = htmlentities($_POST['head']);                       *
+     * $ejn_text = htmlentities($_POST['text']);                       *
      * *****************************************************************
     */
     $ejn_head = $_POST['ejn_head'];
@@ -182,7 +158,8 @@ if (isset($_GET[$ejn_edit])) {
                         "            <div class=ejn_head>" .
                         date('Y-m-d H:i:s') .
                         " <strong>$ejn_head</strong></div>\n" .
-                        "            <div class=ejn_text>$ejn_text</div>\n" .
+                        "            <div class=ejn_text>" .
+                        "$ejn_text</div>\n" .
                         "        </div>\n";
 
             //** Check data folder
@@ -239,7 +216,6 @@ if (isset($_GET[$ejn_edit])) {
         }
     }
 
-    //** Open editor form
     echo "        <form action=\"#\" " .
          "method=POST accept-charset=\"UTF-8\">\n" .
          "        <h2>" . $ejn_lstr['new'] . "</h2>\n" .
@@ -247,9 +223,8 @@ if (isset($_GET[$ejn_edit])) {
     //** Entry title
          "            <p><label for=ejn_head>" .
          $ejn_lstr['head'] . "</label></p>\n" .
-         "            <textarea " .
-         "name=ejn_head id=ejn_head rows=2 cols=80 " .
-         "title=\"" . $ejn_lstr['head_tip'] . "\">";
+         "            <textarea name=ejn_head id=ejn_head " .
+         "rows=2 cols=80 title=\"" . $ejn_lstr['head_tip'] . "\">";
 
     if (isset($ejn_head)) {
         echo $ejn_head;
@@ -328,10 +303,9 @@ if (isset($_GET[$ejn_edit])) {
                 $ejn_list = str_replace(".html", "", $ejn_list);
 
                 echo "                    <li>" .
-                     "<a href=\"" .
-                     "$ejn_prot$ejn_host$ejn_fold$ejn_data/$ejn_file\" " .
-                     "title=\"" . $ejn_lstr['view_tip'] . " " .
-                     str_replace(".html", "", $ejn_file) . "\" " .
+                     "<a href=\"$ejn_prot$ejn_host$ejn_fold$ejn_data" .
+                     "/$ejn_file\" title=\"" . $ejn_lstr['view_tip'] .
+                     " " . str_replace(".html", "", $ejn_file) . "\" " .
                      "class=ejn_ext>$ejn_list</a></li>\n";
             }
 
@@ -345,12 +319,6 @@ if (isset($_GET[$ejn_edit])) {
     }
 }
 
-/**
- * Footer
- *
- * GPL v3 -- Please keep the script reference intact.
- * Others may also find this useful.
- */
 echo "        <p>&copy; " . date('Y') . " $ejn_host - " .
      $ejn_lstr['rights'] . "</p>\n" .
      "        <p id=ejn_by>" . $ejn_lstr['by'] . " " .
@@ -359,7 +327,7 @@ echo "        <p>&copy; " . date('Y') . " $ejn_host - " .
      "class=ejn_ext>PHP Easy Journal v$ejn_make</a></p>\n" .
      "        <script>var a=document.getElementsByTagName('a');" .
      "for(var i in a){if(a[i].className&&" .
-     "a[i].className.indexOf('ejn_ext') !=-1){a[i].onclick=function(){" .
-     "return !window.open(this);}}}</script>\n" .
+     "a[i].className.indexOf('ejn_ext') !=-1){a[i].onclick=" .
+     "function(){return !window.open(this);}}}</script>\n" .
      "    </body>\n" .
      "</html>\n";
